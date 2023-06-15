@@ -1,15 +1,55 @@
 import socket
 import threading
 
+
+def realizar_login(client_socket):
+    # Implemente a lógica de login do servidor
+    pass
+
+def realizar_registro(client_socket):
+    # Implemente a lógica de registro do servidor
+    pass
+
+def enviar_numeros_disponiveis(client_socket):
+    # Implemente a lógica para enviar ao cliente a lista de números disponíveis
+    pass
+
+def comprar_numero(client_socket, numero):
+    # Implemente a lógica para registrar a compra de um número específico pelo cliente
+    pass
+
+def sortear_numero():
+    # Implemente a lógica para realizar o sorteio do número vencedor
+    pass
+
+def enviar_resultado_sorteio(client_socket):
+    # Implemente a lógica para enviar ao cliente o resultado do sorteio
+    pass
+
+
 def handle_client(client_socket):
-    # Lógica para tratar as requisições do cliente
-    # Aqui você pode implementar a lógica do sorteio da rifa
+    while True:
+        # Receber a mensagem do cliente
+        data = client_socket.recv(1024).decode()
+        if not data:
+            break
 
-    # Exemplo de envio de uma mensagem de resposta para o cliente
-    response = "O número sorteado é: 42"
-    client_socket.send(response.encode())
+        # Interpretar a mensagem recebida e chamar a função correspondente
+        command, *args = data.split()
+        if command == "LOGIN":
+            realizar_login(client_socket)
+        elif command == "REGISTRO":
+            realizar_registro(client_socket)
+        elif command == "EXIBIR":
+            enviar_numeros_disponiveis(client_socket)
+        elif command == "COMPRAR":
+            numero = args[0]
+            comprar_numero(client_socket, numero)
+        elif command == "SORTEIO":
+            sortear_numero()
+            enviar_resultado_sorteio(client_socket)
 
-    # Fechando a conexão com o cliente
+    # Fechar a conexão com o cliente
     client_socket.close()
 
 def start_server():
