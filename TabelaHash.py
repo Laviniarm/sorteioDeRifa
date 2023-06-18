@@ -1,6 +1,5 @@
 import random
 
-
 class Rifa:
     def __init__(self):
         self.__numerosDisponiveis = []
@@ -9,6 +8,8 @@ class Rifa:
         self.__numerosDisponiveis = list(range(1, 21))
 
     def sortear_numero(self):
+        if len(self.__numerosDisponiveis) == 0:
+            raise ValueError("Não há mais números disponíveis para sorteio.")
         numero_sorteado = random.choice(self.__numerosDisponiveis)
         self.__numerosDisponiveis.remove(numero_sorteado)
         return numero_sorteado
@@ -21,11 +22,12 @@ class Rifa:
         return self.__numerosDisponiveis
 
 
+
 class Pessoa:
-    def __init__(self, nome, cpf, numeros_comprados):
+    def __init__(self, nome, cpf):
         self.__nome = nome
         self.__cpf = cpf
-        self.__numeros_comprados = numeros_comprados
+        self.__numeros_comprados = []
 
     @property
     def nome(self):
@@ -39,8 +41,11 @@ class Pessoa:
     def numeros_comprados(self):
         return self.__numeros_comprados
 
+    def comprar_numero(self, numero):
+        self.__numeros_comprados.append(numero)
 
-class Nodo:
+
+class No:
     def __init__(self, chave, valor):
         self.__chave = chave
         self.__valor = valor
@@ -68,15 +73,15 @@ class ListaEncadeada:
         self.__primeiro = None
 
     def inserir(self, chave, valor):
-        novo_nodo = Nodo(chave, valor)
+        novo_no = No(chave, valor)
 
         if self.__primeiro is None:
-            self.__primeiro = novo_nodo
+            self.__primeiro = novo_no
         else:
             atual = self.__primeiro
             while atual.proximo is not None:
                 atual = atual.proximo
-            atual.proximo = novo_nodo
+            atual.proximo = novo_no
 
     def buscar(self, chave):
         atual = self.__primeiro
@@ -108,15 +113,14 @@ def realizar_compra_rifas():
     nome = input("Digite o nome: ")
     cpf = input("Digite o CPF: ")
 
-    pessoa = Pessoa(nome, cpf, [])
+    pessoa = Pessoa(nome, cpf)
 
     rifa = Rifa()
     rifa.criar_lista()
 
     rifa.mostrar_numeros_disponiveis()
 
-    quantidade_rifas = int(
-        input("Digite a quantidade de rifas que deseja comprar: "))
+    quantidade_rifas = int(input("Digite a quantidade de rifas que deseja comprar: "))
 
     for _ in range(quantidade_rifas):
         numero_escolhido = int(input("Digite o número que deseja comprar: "))
@@ -129,6 +133,7 @@ def realizar_compra_rifas():
     rifa.mostrar_numeros_disponiveis()
 
     return pessoa
+
 
 
 # Criação da tabela hash
@@ -154,8 +159,9 @@ cpf_busca = input("Digite o CPF da pessoa que deseja buscar: ")
 resultado_busca = tabela_hash.buscar(cpf_busca)
 
 if resultado_busca is not None:
-    print("Nome:", resultado_busca.valor.nome)
-    print("CPF:", resultado_busca.valor.cpf)
-    print("Números comprados:", resultado_busca.valor.numeros_comprados)
+    print("Nome:", resultado_busca.nome)
+    print("CPF:", resultado_busca.cpf)
+    print("Números comprados:", resultado_busca.numeros_comprados)
+
 else:
     print("Objeto não encontrado na tabela hash.")
