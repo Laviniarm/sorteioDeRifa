@@ -109,59 +109,59 @@ class TabelaHash:
         return self.__tabela[indice].buscar(chave)
 
 
-def realizar_compra_rifas():
-    nome = input("Digite o nome: ")
-    cpf = input("Digite o CPF: ")
+# def realizar_compra_rifas():
+#     nome = input("Digite o nome: ")
+#     cpf = input("Digite o CPF: ")
 
-    pessoa = Pessoa(nome, cpf)
+#     pessoa = Pessoa(nome, cpf)
 
-    rifa = Rifa()
-    rifa.criar_lista()
+#     rifa = Rifa()
+#     rifa.criar_lista()
 
-    rifa.mostrar_numeros_disponiveis()
+#     rifa.mostrar_numeros_disponiveis()
 
-    quantidade_rifas = int(input("Digite a quantidade de rifas que deseja comprar: "))
+#     quantidade_rifas = int(input("Digite a quantidade de rifas que deseja comprar: "))
 
-    for _ in range(quantidade_rifas):
-        numero_escolhido = int(input("Digite o número que deseja comprar: "))
-        if numero_escolhido in rifa.numeros_disponiveis:
-            rifa.numeros_disponiveis.remove(numero_escolhido)
-            pessoa.numeros_comprados.append(numero_escolhido)
-        else:
-            print("Número indisponível. Escolha outro número.")
+#     for _ in range(quantidade_rifas):
+#         numero_escolhido = int(input("Digite o número que deseja comprar: "))
+#         if numero_escolhido in rifa.numeros_disponiveis:
+#             rifa.numeros_disponiveis.remove(numero_escolhido)
+#             pessoa.numeros_comprados.append(numero_escolhido)
+#         else:
+#             print("Número indisponível. Escolha outro número.")
 
-    rifa.mostrar_numeros_disponiveis()
+#     rifa.mostrar_numeros_disponiveis()
 
-    return pessoa
+#     return pessoa
 
 
 
 # Criação da tabela hash
-tabela_hash = TabelaHash(10)
+# tabela_hash = TabelaHash(10)
 
-# Lista de pessoas
-lista_pessoas = []
+# # Lista de pessoas
+# lista_pessoas = []
 
-# Realizar a compra de rifas e adicionar objetos Pessoa à lista
-pessoa1 = realizar_compra_rifas()
-lista_pessoas.append(pessoa1)
+# # Realizar a compra de rifas e adicionar objetos Pessoa à lista
+# pessoa1 = realizar_compra_rifas()
+# lista_pessoas.append(pessoa1)
 
-pessoa2 = realizar_compra_rifas()
-lista_pessoas.append(pessoa2)
+# pessoa2 = realizar_compra_rifas()
+# lista_pessoas.append(pessoa2)
 
-# Inserção dos objetos na tabela hash
-for pessoa in lista_pessoas:
-    tabela_hash.inserir(pessoa.cpf, pessoa)
+# # Inserção dos objetos na tabela hash
+# for pessoa in lista_pessoas:
+#     tabela_hash.inserir(pessoa.cpf, pessoa)
 
 
-# Busca de um objeto na tabela hash pelo CPF
-cpf_busca = input("Digite o CPF da pessoa que deseja buscar: ")
-resultado_busca = tabela_hash.buscar(cpf_busca)
+# # Busca de um objeto na tabela hash pelo CPF
+# cpf_busca = input("Digite o CPF da pessoa que deseja buscar: ")
+# resultado_busca = tabela_hash.buscar(cpf_busca)
 
-if resultado_busca is not None:
-    print("Nome:", resultado_busca.nome)
-    print("CPF:", resultado_busca.cpf)
-    print("Números comprados:", resultado_busca.numeros_comprados)
+# if resultado_busca is not None:
+#     print("Nome:", resultado_busca.nome)
+#     print("CPF:", resultado_busca.cpf)
+#     print("Números comprados:", resultado_busca.numeros_comprados)
 
-else:
-    print("Objeto não encontrado na tabela hash.")
+# else:
+#     print("Objeto não encontrado na tabela hash.")

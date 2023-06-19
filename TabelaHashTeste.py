@@ -6,9 +6,9 @@ def exibir_menu():
     print("2. Buscar pessoa por CPF")
     print("3. Sair")
 
-def realizar_compra():
+def realizar_compra(tabelaHash):
     pessoa = realizar_compra_rifas()
-    TabelaHash.inserir(pessoa.cpf, pessoa)
+    tabelaHash.inserir(pessoa.cpf, pessoa)
     print("Compra realizada com sucesso!")
 
 def buscar_pessoa():
@@ -25,14 +25,14 @@ def buscar_pessoa():
 
 def main():
     # Criação da tabela hash
-    TabelaHash = TabelaHash(10)
+    tabela = TabelaHash(10)
 
     while True:
         exibir_menu()
         opcao = input("Digite o número da opção desejada: ")
 
         if opcao == "1":
-            realizar_compra()
+            realizar_compra(tabela)
         elif opcao == "2":
             buscar_pessoa()
         elif opcao == "3":
