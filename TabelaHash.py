@@ -1,167 +1,118 @@
-import random
+class No:
+    def __init__(self, info):
+        self.__info = info
+        self.__proximo = None
 
-class Rifa:
+    def get_info(self):
+        return self.__info
+
+    def set_info(self, info):
+        self.__info = info
+
+    def get_proximo(self):
+        return self.__proximo
+
+    def set_proximo(self, proximo):
+        self.__proximo = proximo
+
+
+class ListaNumeros:
     def __init__(self):
-        self.__numerosDisponiveis = []
+        self.numeros = []
 
-    def criar_lista(self):
-        self.__numerosDisponiveis = list(range(1, 21))
+    def inicializar(self, quantidade):
+        self.numeros = list(range(1, quantidade + 1))
 
-    def sortear_numero(self):
-        if len(self.__numerosDisponiveis) == 0:
-            raise ValueError("Não há mais números disponíveis para sorteio.")
-        numero_sorteado = random.choice(self.__numerosDisponiveis)
-        self.__numerosDisponiveis.remove(numero_sorteado)
-        return numero_sorteado
+    def remover_numero(self, numero):
+        if numero in self.numeros:
+            self.numeros.remove(numero)
 
-    def mostrar_numeros_disponiveis(self):
-        print("Números disponíveis:", self.__numerosDisponiveis)
-
-    @property
-    def numeros_disponiveis(self):
-        return self.__numerosDisponiveis
-
+    def verificar_disponibilidade(self, numero):
+        return numero in self.numeros
 
 
 class Pessoa:
     def __init__(self, nome, cpf):
-        self.__nome = nome
-        self.__cpf = cpf
-        self.__numeros_comprados = []
+        self.nome = nome
+        self.cpf = cpf
+        self.numeros_comprados = []
 
-    @property
-    def nome(self):
-        return self.__nome
-
-    @property
-    def cpf(self):
-        return self.__cpf
-
-    @property
-    def numeros_comprados(self):
-        return self.__numeros_comprados
-
-    def comprar_numero(self, numero):
-        self.__numeros_comprados.append(numero)
-
-
-class No:
-    def __init__(self, chave, valor):
-        self.__chave = chave
-        self.__valor = valor
-        self.__proximo = None
-
-    @property
-    def chave(self):
-        return self.__chave
-
-    @property
-    def valor(self):
-        return self.__valor
-
-    @property
-    def proximo(self):
-        return self.__proximo
-
-    @proximo.setter
-    def proximo(self, novo_proximo):
-        self.__proximo = novo_proximo
-
-
-class ListaEncadeada:
-    def __init__(self):
-        self.__primeiro = None
-
-    def inserir(self, chave, valor):
-        novo_no = No(chave, valor)
-
-        if self.__primeiro is None:
-            self.__primeiro = novo_no
+    def comprar_numero(self, numero, lista_numeros):
+        if lista_numeros.verificar_disponibilidade(numero):
+            self.numeros_comprados.append(numero)
+            lista_numeros.remover_numero(numero)
+            print(f"O número {numero} foi comprado com sucesso!")
         else:
-            atual = self.__primeiro
-            while atual.proximo is not None:
-                atual = atual.proximo
-            atual.proximo = novo_no
+            print(f"O número {numero} não está disponível para compra.")
 
-    def buscar(self, chave):
-        atual = self.__primeiro
-        while atual is not None:
-            if atual.chave == chave:
-                return atual.valor
-            atual = atual.proximo
-        return None
+    def __str__(self):
+        return f"Nome: {self.nome}\nCPF: {self.cpf}\nNúmeros comprados: {', '.join(str(num) for num in self.numeros_comprados)}"
+
 
 
 class TabelaHash:
     def __init__(self, tamanho):
         self.__tamanho = tamanho
-        self.__tabela = [ListaEncadeada() for _ in range(tamanho)]
+        self.__tabela = [None] * tamanho
 
-    def calcular_indice(self, chave):
-        return hash(chave) % self.__tamanho
+    def _funcao_hash(self, info):
+        return hash(info) % self.__tamanho
 
-    def inserir(self, chave, valor):
-        indice = self.calcular_indice(chave)
-        self.__tabela[indice].inserir(chave, valor)
+    def inserir(self, info):
+        indice = self._funcao_hash(info)
+        novo = No(info)
 
-    def buscar(self, chave):
-        indice = self.calcular_indice(chave)
-        return self.__tabela[indice].buscar(chave)
+        if self.__tabela[indice] is None:
+            self.__tabela[indice] = novo
+        else:
+            leitor = self.__tabela[indice]
+            anterior = None
+            while leitor is not None and leitor.get_info() <= info:
+                anterior = leitor
+                leitor = leitor.get_proximo()
+
+            if leitor is not None:
+                if anterior is not None:
+                    novo.set_proximo(leitor)
+                    anterior.set_proximo(novo)
+                else:
+                    novo.set_proximo(self.__tabela[indice])
+                    self.__tabela[indice] = novo
+            else:
+                anterior.set_proximo(novo)
+
+    def buscar(self, info):
+        indice = self._funcao_hash(info)
+        no = self.__tabela[indice]
+
+        while no is not None:
+            if no.get_info() == info:
+                return no
+            no = no.get_proximo()
+
+        return None
+
+    def remover(self, info):
+        indice = self._funcao_hash(info)
+        no = self.__tabela[indice]
+        anterior = None
+
+        while no is not None:
+            if no.get_info() == info:
+                if anterior is None:
+                    self.__tabela[indice] = no.get_proximo()
+                else:
+                    anterior.set_proximo(no.get_proximo())
+                return
+            anterior = no
+            no = no.get_proximo()
+
+    def exibir(self):
+        for indice, no in enumerate(self.__tabela):
+            print(f"Índice {indice}: ", end="")
+            while no is not None:
+                print(f"({no.get_info()}) -> ", end="")
+                no = no.get_proximo()
+            print("None")
 
 
-# def realizar_compra_rifas():
-#     nome = input("Digite o nome: ")
-#     cpf = input("Digite o CPF: ")
-
-#     pessoa = Pessoa(nome, cpf)
-
-#     rifa = Rifa()
-#     rifa.criar_lista()
-
-#     rifa.mostrar_numeros_disponiveis()
-
-#     quantidade_rifas = int(input("Digite a quantidade de rifas que deseja comprar: "))
-
-#     for _ in range(quantidade_rifas):
-#         numero_escolhido = int(input("Digite o número que deseja comprar: "))
-#         if numero_escolhido in rifa.numeros_disponiveis:
-#             rifa.numeros_disponiveis.remove(numero_escolhido)
-#             pessoa.numeros_comprados.append(numero_escolhido)
-#         else:
-#             print("Número indisponível. Escolha outro número.")
-
-#     rifa.mostrar_numeros_disponiveis()
-
-#     return pessoa
-
-
-
-# Criação da tabela hash
-# tabela_hash = TabelaHash(10)
-
-# # Lista de pessoas
-# lista_pessoas = []
-
-# # Realizar a compra de rifas e adicionar objetos Pessoa à lista
-# pessoa1 = realizar_compra_rifas()
-# lista_pessoas.append(pessoa1)
-
-# pessoa2 = realizar_compra_rifas()
-# lista_pessoas.append(pessoa2)
-
-# # Inserção dos objetos na tabela hash
-# for pessoa in lista_pessoas:
-#     tabela_hash.inserir(pessoa.cpf, pessoa)
-
-
-# # Busca de um objeto na tabela hash pelo CPF
-# cpf_busca = input("Digite o CPF da pessoa que deseja buscar: ")
-# resultado_busca = tabela_hash.buscar(cpf_busca)
-
-# if resultado_busca is not None:
-#     print("Nome:", resultado_busca.nome)
-#     print("CPF:", resultado_busca.cpf)
-#     print("Números comprados:", resultado_busca.numeros_comprados)
-
-# else:
-#     print("Objeto não encontrado na tabela hash.")
