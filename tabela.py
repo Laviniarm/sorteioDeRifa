@@ -1,6 +1,5 @@
 import random
 
-
 class Rifa:
     def __init__(self):
         self.__numerosDisponiveis = []
@@ -42,7 +41,7 @@ class Pessoa:
     def numeros_comprados(self):
         return self.__numeros_comprados
 
-    def comprar_numero(self, numero, tabela):
+    def comprar_numero(self, numero, TabelaHash ):
         self.__numeros_comprados.append(numero)
         TabelaHash.adicionar(numero, self.__cpf)
     
@@ -98,43 +97,18 @@ class ListaEncadeada:
 class TabelaHash:
     def __init__(self, tamanho):
         self.tamanho = tamanho
-        self.buckets = [None] * tamanho
+        self.__tabela = [ListaEncadeada() for _ in range(tamanho)]
 
     def calcular_indice(self, chave):
         return chave % self.tamanho
 
     def adicionar(self, chave, valor):
         indice = self.calcular_indice(chave)
-        no = No(chave, valor)
-        
-        if self.buckets[indice] is None:
-            self.buckets[indice] = no
-        else:
-            atual = self.buckets[indice]
-            while atual.proximo is not None:
-                if atual.chave == chave:
-                    return  # Retorna sem fazer alterações se a chave já existir
-                atual = atual.proximo
-            
-            if atual.chave == chave:
-                return  # Retorna sem fazer alterações se a chave já existir
-            else:
-                atual.proximo = no
-
+        self.__tabela[indice].inserir(chave, valor)
 
     def buscar(self, chave):
-
         indice = self.calcular_indice(chave)
-
-        if self.buckets[indice] is None:
-            return None
-        else:
-            atual = self.buckets[indice]
-            while atual is not None:
-                if atual.chave == chave:
-                    return atual.valor
-                atual = atual.proximo
-        return None
+        return self.__tabela[indice].buscar(chave)
 
 
 def realizar_compra_rifas():
@@ -142,7 +116,6 @@ def realizar_compra_rifas():
     cpf = input("Digite o CPF: ")
 
     pessoa = Pessoa(nome, cpf)
-
     rifa = Rifa()
     rifa.criar_lista()
 
@@ -159,7 +132,7 @@ def realizar_compra_rifas():
 
     rifa.mostrar_numeros_disponiveis()
 
-    cpf = TabelaHash.buscar()
+    cpf = tabela_hash.buscar(numero_escolhido)
     print("CPF associado ao número da rifa:", cpf)
 
     return pessoa
