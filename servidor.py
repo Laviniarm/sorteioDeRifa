@@ -1,79 +1,90 @@
 import socket
 import threading
+from TabelaHash import TabelaHash
+from Rifa import Rifa
+from Pessoa import Pessoa
 
+def handle_registro(client_socket, tabela_hash):
+    data = client_socket.recv(1024).decode()
+    nome, cpf = data.split("|")[1:]
+    Pessoa(nome, cpf)
+    response = "Registro realizado com sucesso."
+    client_socket.send(response.encode())
 
-def realizar_login(client_socket):
-    # Implemente a lógica de login do servidor
-    pass
+def handle_compra(client_socket, tabela_hash, rifa):
+    data = client_socket.recv(1024).decode()
+    cpf, numero = data.split("|")[1:]
+    
+    # Verificar se o CPF está registrado na tabela hash
+    if tabela_hash.buscar(cpf) is None:
+        response = "CPF não registrado. Realize o registro antes de efetuar a compra."
+        client_socket.send(response.encode())
+        return
+    
+    # Verificar se o número da rifa está disponível
+    if numero not in rifa.numeros_disponiveis:
+        response = "Número da rifa indisponível. Escolha outro número."
+        client_socket.send(response.encode())
+        return
+    
+    # Realizar a compra do número pela pessoa correspondente
+    pessoa = tabela_hash.buscar(cpf)
+    pessoa.comprar_numero(numero, tabela_hash)
+    rifa.numeros_disponiveis.remove(numero)
+    
+    response = "Compra realizada com sucesso."
+    client_socket.send(response.encode())
 
-def realizar_registro(client_socket):
-    # Implemente a lógica de registro do servidor
-    pass
+def handle_numeros_disponiveis(client_socket, rifa):
+    numeros_disponiveis = rifa.numeros_disponiveis
+    response = ",".join(map(str, numeros_disponiveis))
+    client_socket.send(response.encode())
 
-def enviar_numeros_disponiveis(client_socket):
-    # Implemente a lógica para enviar ao cliente a lista de números disponíveis
-    pass
+def handle_consultar_resultado(client_socket, rifa):
+    try:
+        numero_sorteado = rifa.sortear_numero()
+        response = str(numero_sorteado)
+    except ValueError as e:
+        response = str(e)
+    client_socket.send(response.encode())
 
-def comprar_numero(client_socket, numero):
-    # Implemente a lógica para registrar a compra de um número específico pelo cliente
-    pass
+def handle_client(client_socket, client_address, tabela_hash, rifa):
+    print(f"Conexão estabelecida com {client_address[0]}:{client_address[1]}")
 
-def sortear_numero():
-    # Implemente a lógica para realizar o sorteio do número vencedor
-    pass
-
-def enviar_resultado_sorteio(client_socket):
-    # Implemente a lógica para enviar ao cliente o resultado do sorteio
-    pass
-
-
-def handle_client(client_socket):
     while True:
-        # Receber a mensagem do cliente
         data = client_socket.recv(1024).decode()
         if not data:
             break
 
-        # Interpretar a mensagem recebida e chamar a função correspondente
-        command, *args = data.split()
-        if command == "LOGIN":
-            realizar_login(client_socket)
-        elif command == "REGISTRO":
-            realizar_registro(client_socket)
-        elif command == "EXIBIR":
-            enviar_numeros_disponiveis(client_socket)
-        elif command == "COMPRAR":
-            numero = args[0]
-            comprar_numero(client_socket, numero)
-        elif command == "SORTEIO":
-            sortear_numero()
-            enviar_resultado_sorteio(client_socket)
+        if data.startswith("REGISTRO"):
+            handle_registro(client_socket, tabela_hash)
+        elif data.startswith("COMPRA"):
+            handle_compra(client_socket, tabela_hash)
+        elif data == "NUMEROS_DISPONIVEIS":
+            handle_numeros_disponiveis(client_socket, rifa)
+        elif data == "CONSULTAR_RESULTADO":
+            handle_consultar_resultado(client_socket, rifa)
 
-    # Fechar a conexão com o cliente
     client_socket.close()
+    print(f"Conexão encerrada com {client_address[0]}:{client_address[1]}")
 
 def start_server():
-    # Configurando o host e a porta do servidor
-    host = '192.168.0.11'  # Use o IP correto do servidor
+    host = '192.168.0.11'  # IP do servidor
     port = 5000
 
-    # Criando um socket TCP/IP
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    # Ligando o socket ao host e à porta
     server_socket.bind((host, port))
-
-    # Habilitando o servidor para aceitar conexões
     server_socket.listen(5)
-    print(f"Servidor ouvindo em {host}:{port}")
+    print(f"Servidor aguardando conexões em {host}:{port}")
+
+    rifa = Rifa()
+    rifa.criar_lista()
+
+    tabela_hash = TabelaHash(31)
 
     while True:
-        # Aceitando a conexão de um cliente
-        client_socket, address = server_socket.accept()
-        print(f"Conexão estabelecida com {address[0]}:{address[1]}")
-
-        # Criando uma nova thread para tratar o cliente
-        client_thread = threading.Thread(target=handle_client, args=(client_socket,))
+        client_socket, client_address = server_socket.accept()
+        client_thread = threading.Thread(target=handle_client, args=(client_socket, client_address, tabela_hash, rifa))
         client_thread.start()
 
 start_server()

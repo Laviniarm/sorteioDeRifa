@@ -1,84 +1,63 @@
 import socket
 
+def realizar_registro(client_socket):
+    nome = input("Digite o nome: ")
+    cpf = input("Digite o CPF: ")
+    mensagem = f"REGISTRO|{nome}|{cpf}"
+    client_socket.send(mensagem.encode())
+    response = client_socket.recv(1024).decode()
+    print(response)
 
-def realizar_login():
-    # Implemente a lógica de login do cliente
-    print("Realizando login do cliente...")
+def comprar_numero(client_socket):
+    numero = input("Digite o número que deseja comprar: ")
+    mensagem = f"COMPRA|{numero}"
+    client_socket.send(mensagem.encode())
+    response = client_socket.recv(1024).decode()
+    print(response)
 
+def exibir_numeros_disponiveis(client_socket):
+    mensagem = "NUMEROS_DISPONIVEIS"
+    client_socket.send(mensagem.encode())
+    response = client_socket.recv(1024).decode()
+    print("Números disponíveis:", response)
 
-def realizar_registro():
-    # Implemente a lógica de registro do cliente
-    print("Realizando registro do cliente...")
+def consultar_resultado(client_socket):
+    mensagem = "CONSULTAR_RESULTADO"
+    client_socket.send(mensagem.encode())
+    response = client_socket.recv(1024).decode()
+    print("Resultado do sorteio:", response)
 
+def connect_to_server():
+    host = '192.168.0.11'  # IP do servidor
+    port = 5000
 
-def exibir_numeros_disponiveis():
-    # Implemente a lógica para solicitar ao servidor a lista de números disponíveis
-    print("Exibindo números disponíveis...")
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((host, port))
+    print(f"Conectado ao servidor {host}:{port}")
 
-
-def comprar_numero(numero):
-    # Implemente a lógica para solicitar ao servidor a compra de um número específico
-    print("Comprando número:", numero)
-
-
-def consultar_resultado():
-    # Implemente a lógica para solicitar ao servidor o resultado do sorteio
-    print("Consultando resultado do sorteio...")
-
-
-def exibir_menu():
     while True:
         print("== Menu ==")
-        print("1. Login")
-        print("2. Registro")
+        print("1. Registro")
+        print("2. Comprar número")
         print("3. Exibir números disponíveis")
-        print("4. Comprar número")
-        print("5. Consultar resultado do sorteio")
+        print("4. Consultar resultado do sorteio")
         print("0. Sair")
 
         opcao = input("Digite a opção desejada: ")
 
         if opcao == "1":
-            realizar_login()
+            realizar_registro(client_socket)
         elif opcao == "2":
-            realizar_registro()
+            comprar_numero(client_socket)
         elif opcao == "3":
-            exibir_numeros_disponiveis()
+            exibir_numeros_disponiveis(client_socket)
         elif opcao == "4":
-            numero = input("Digite o número que deseja comprar: ")
-            comprar_numero(numero)
-        elif opcao == "5":
-            consultar_resultado()
+            consultar_resultado(client_socket)
         elif opcao == "0":
             break
         else:
             print("Opção inválida. Tente novamente.")
 
-def connect_to_server():
-    # Configurando o host e a porta do servidor
-    host = '192.168.0.11'  # Use o IP correto do servidor
-    port = 5000
-
-    # Criando um socket TCP/IP
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    # Conectando ao servidor
-    client_socket.connect((host, port))
-    print(f"Conectado ao servidor {host}:{port}")
-    
-
-    # Lógica do cliente
-    exibir_menu()
-    # Aqui você pode implementar a interação com o usuário para escolher um número da rifa
-
-    # Enviando a escolha do cliente para o servidor
-    numero_escolhido = "42"
-    client_socket.send(numero_escolhido.encode())
-    # Recebendo a resposta do servidor
-    response = client_socket.recv(1024).decode()
-    print("Resposta do servidor:", response)
-
-    # Fechando a conexão com o servidor
     client_socket.close()
 
 connect_to_server()

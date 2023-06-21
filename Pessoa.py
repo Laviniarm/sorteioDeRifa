@@ -1,5 +1,4 @@
-from TabelaH import TabelaHash
-
+from TabelaHash import TabelaHash
 
 class Pessoa:
     def __init__(self, nome, cpf):
