@@ -37,6 +37,9 @@ class ListaEncadeada:
     def __len__(self):
         return self.__tamanho
     
+    def getNumero(self):
+        return self.__primeiro.chave
+    
     def inserirOrdem(self, total):
         for i in range(total):
             self.insereFim(i+1)
