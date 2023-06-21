@@ -1,3 +1,5 @@
+import random
+
 class No:
     def __init__(self, chave, valor):
         self.__chave = chave
@@ -24,6 +26,20 @@ class No:
 class ListaEncadeada:
     def __init__(self):
         self.__primeiro = None
+        self.__tamanho = 0
+    
+    def estaVazia(self):
+        return self.__tamanho == 0
+
+    def tamanho(self):
+        return self.__tamanho
+
+    def __len__(self):
+        return self.__tamanho
+    
+    def inserirOrdem(self, total):
+        for i in range(total):
+            self.insereFim(i+1)
 
     def inserir(self, chave, valor):
         novo_no = No(chave, valor)
@@ -35,6 +51,7 @@ class ListaEncadeada:
             while atual.proximo is not None:
                 atual = atual.proximo
             atual.proximo = novo_no
+        self.__tamanho += 1
 
     def buscar(self, chave):
         atual = self.__primeiro
@@ -43,3 +60,15 @@ class ListaEncadeada:
                 return atual.valor
             atual = atual.proximo
         return None
+
+    def __str__(self):
+        s = ''
+        cursor = self.__primeiro
+        while( cursor != None ):
+            if cursor.proximo is None:
+                s+= f'{cursor.valor}'
+            else:
+                s += f'{cursor.valor}, '
+            cursor = cursor.proximo
+        s += ''
+        return s
