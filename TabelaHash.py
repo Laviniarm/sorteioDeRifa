@@ -1,5 +1,5 @@
 import random
-from ListaEncadeada2 import ListaEncadeada
+from ListaEncadeada import ListaEncadeada
 
 class TabelaHash:
     def __init__(self, tamanho):
@@ -9,13 +9,30 @@ class TabelaHash:
     def calcular_indice(self, chave):
         return chave % self.tamanho
 
-    def adicionar(self, chave, valor):
+    def comprar(self, chave, valor):
         indice = self.calcular_indice(chave)
         self.__tabela[indice].inserir(chave, valor)
+        return True
+
+    def __len__(self):
+        return self.tamanho
 
     def buscar(self, chave):
         indice = self.calcular_indice(chave)
         return self.__tabela[indice].buscar(chave)
+    
+    # def comprar(self, cpf, numero):
+    #     indice = numero % self.tamanho
+
+    #     if self[indice]:
+    #         return False
+
+    #     self[indice] = [cpf, numero]
+    #     return True
+
+    def numeros_nao_comprados(self):
+        numeros = [i for i, comprador in enumerate(self.__tabela) if not comprador]
+        return numeros
     
     def __str__(self):
         s = ""
@@ -52,14 +69,3 @@ class TabelaHash:
                     if chave < 10:
                         v.append(f'0{chave}')
         return f'CPF: {valor}\nNumeros comprados: {v}'
-
-if __name__ == "__main__":
-    t = TabelaHash(6)
-    t.adicionar(1, '06824224448')
-    t.adicionar(3, '11032391472')
-    t.adicionar(4, '72589515472')
-    t.adicionar(5, '06824224448')
-    print(t)
-    print(t.sorteio())
-    print('')
-    print(t.imprimirCPF('06824224448'))
