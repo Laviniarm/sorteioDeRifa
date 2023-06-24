@@ -1,5 +1,5 @@
 import random
-from ListaEncadeada import ListaEncadeada
+from listaEncadeada import ListaEncadeada
 
 class TabelaHash:
     def __init__(self, tamanho):
