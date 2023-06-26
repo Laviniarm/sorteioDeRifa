@@ -12,14 +12,22 @@ port = 8888
 client_socket.connect((host, port))
 
 mensagem_servidor = client_socket.recv(1024).decode()
-print("Mensagem do servidor:", mensagem_servidor)
+print(mensagem_servidor)
 
 def enviar_mensagem(mensagem):
     client_socket.send(mensagem.encode())
     resposta = client_socket.recv(1024).decode()
     return resposta
 
-while True:
+def validaCPF(cpf):
+    if len(cpf) == 11 and cpf.isdigit():
+        return True
+    else:
+        return False
+
+esgotou = enviar_mensagem(f"ESGOTOU")
+
+while esgotou != "ESGOTOU":
     print('''
 1 - Comprar número
 2 - Ver números disponíveis
@@ -33,10 +41,14 @@ while True:
         resposta = enviar_mensagem("NUMEROS_DISPONIVEIS")
         print(resposta)
         cpf = input("Digite o CPF: ")
+        while not validaCPF(cpf):
+            cls()
+            print("CPF inválido! Tente novamente.")
+            cpf = input("Digite o CPF: ")
         numero = input("Digite o número desejado: ")
         cls()
         resposta = enviar_mensagem(f"COMPRAR {cpf} {numero}")
-        print(resposta)
+        print(resposta)                
     
     elif choice == '2':
         cls()
@@ -57,4 +69,11 @@ while True:
         cls()
         print("Opção inválida! Tente novamente.")
 
-client_socket.close()
+    esgotou = enviar_mensagem(f"ESGOTOU")
+
+sorteio = enviar_mensagem(f"SORTEIO")
+print(sorteio)
+
+x = input("Para encerrar digite 0: ")
+if x == 0:
+    client_socket.close()

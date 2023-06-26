@@ -11,8 +11,8 @@ server_socket.bind((host, port))
 
 print(f"Servidor aguardando conexões em {host}:{port}")
 
-x = int(input("Quantidade de números no sorteio: "))
-tabela = TabelaHash(x)
+# x = int(input("Quantidade de números no sorteio: "))
+tabela = TabelaHash(2)
 
 def handle_client(client_socket):
     print("Cliente conectado:", client_socket.getpeername())
@@ -51,6 +51,18 @@ def handle_client(client_socket):
         
         elif msg_client == "SAIR":
             break
+        
+        elif msg_client == "ESGOTOU":
+            if tabela.esgotou():
+                enviar = "ESGOTOU"
+                client_socket.send(enviar.encode())
+            else:
+                enviar = "NÃO ESGOTOU"
+                client_socket.send(enviar.encode())
+        
+        elif msg_client == "SORTEIO":
+            mensagem = tabela.sorteio()
+            client_socket.send(mensagem.encode())
 
 def accept_connections():
     while True:
