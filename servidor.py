@@ -12,16 +12,21 @@ server_socket.bind((host, port))
 print(f"Servidor aguardando conexões em {host}:{port}")
 
 # x = int(input("Quantidade de números no sorteio: "))
-tabela = TabelaHash(2)
+tabela = TabelaHash(3)
+clientes = []
 
 def handle_client(client_socket):
+    clientes.append(client_socket)
     print("Cliente conectado:", client_socket.getpeername())
     
     mensagem = "Bem vindo à compra de rifa!"
     client_socket.send(mensagem.encode())
-
+    
     while True:
-        msg_client = client_socket.recv(1024).decode()
+        try:
+            msg_client = client_socket.recv(1024).decode()
+        except ConnectionResetError:
+            break
 
         if msg_client.startswith("COMPRAR"):
             _, cpf, numero = msg_client.split()
@@ -59,10 +64,15 @@ def handle_client(client_socket):
             else:
                 enviar = "NÃO ESGOTOU"
                 client_socket.send(enviar.encode())
-        
+
         elif msg_client == "SORTEIO":
             mensagem = tabela.sorteio()
-            client_socket.send(mensagem.encode())
+            for cliente in clientes[:]:
+                cliente.send(mensagem.encode())
+
+       # elif msg_client == "SORTEIO":
+        #    mensagem = tabela.sorteio()
+        #    client_socket.send(mensagem.encode())
 
 def accept_connections():
     while True:
