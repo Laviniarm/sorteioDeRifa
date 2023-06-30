@@ -26,6 +26,7 @@ def handle_client(client_socket):
         try:
             msg_client = client_socket.recv(1024).decode()
         except ConnectionResetError:
+            print("Cliente", client_socket.getpeername(), "desconectou!")
             break
 
         if msg_client.startswith("COMPRAR"):
@@ -55,6 +56,9 @@ def handle_client(client_socket):
         #     client_socket.send(resposta.encode())
         
         elif msg_client == "SAIR":
+            print("Cliente", client_socket.getpeername(), "desconectou!")
+            enviar = "OFF"
+            client_socket.send(enviar.encode())
             break
         
         elif msg_client == "ESGOTOU":

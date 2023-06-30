@@ -63,7 +63,9 @@ while esgotou != "ESGOTOU":
         print(resposta)
     
     elif choice == '4':
-        break
+        resposta = enviar_mensagem("SAIR")
+        if resposta == "OFF":
+            break
 
     else:
         cls()
@@ -71,9 +73,4 @@ while esgotou != "ESGOTOU":
 
     esgotou = enviar_mensagem(f"ESGOTOU")
 
-sorteio = enviar_mensagem(f"SORTEIO")
-print(sorteio)
-
-x = input("Para encerrar digite 0: ")
-if x == 0:
-    client_socket.close()
+client_socket.close()
