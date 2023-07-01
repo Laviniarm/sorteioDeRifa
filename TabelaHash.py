@@ -3,21 +3,22 @@ from listaEncadeada import ListaEncadeada
 
 class TabelaHash:
     def __init__(self, tamanho):
-        self.tamanho = tamanho
+        self.__tamanho = tamanho
         self.__tabela = [ListaEncadeada() for _ in range(tamanho)]
-        self.comprados = 0        
+        self.__comprados = 0        
 
     def calcular_indice(self, chave):
-        return chave % self.tamanho
+        return chave % self.__tamanho
 
     def comprar(self, chave, valor):
         indice = self.calcular_indice(chave)
         self.__tabela[indice].inserir(chave, valor)
-        self.comprados += 1
+        self.__comprados += 1
         return True
 
-    def __len__(self):
-        return self.tamanho
+    @property
+    def tamanho(self):
+        return self.__tamanho
 
     def buscar(self, chave):
         indice = self.calcular_indice(chave)
@@ -31,7 +32,7 @@ class TabelaHash:
 
     #     self[indice] = [cpf, numero]
     #     return True
-
+    
     def numeros_nao_comprados(self):
         numeros = [i for i, comprador in enumerate(self.__tabela) if not comprador]
         return numeros
@@ -58,9 +59,9 @@ class TabelaHash:
         numero_sorteado = random.choice(v)
         cpf = self.buscar(numero_sorteado-1)
         if numero_sorteado < 10:
-            return f'\nSORTEIO!\n\nNumero sorteado: 0{numero_sorteado}\nCPF do ganhahdor: {cpf}\n'
+            return f'\nSORTEIO!\n\nNumero sorteado: 0{numero_sorteado}\nCPF do ganhador: {cpf}\n'
         else:
-            return f'\nSORTEIO!\n\nNumero sorteado: {numero_sorteado}\nCPF do ganhahdor: {cpf}\n'
+            return f'\nSORTEIO!\n\nNumero sorteado: {numero_sorteado}\nCPF do ganhador: {cpf}\n'
     
     def imprimirCPF(self, valor):
         v = []
@@ -73,7 +74,7 @@ class TabelaHash:
         return f'CPF: {valor}\nNumeros comprados: {v}'
     
     def esgotou(self):
-        if self.comprados == self.tamanho:
+        if self.__comprados == self.__tamanho:
             return True
         else:
             return False
