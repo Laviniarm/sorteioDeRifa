@@ -5,15 +5,19 @@ class TabelaHash:
     def __init__(self, tamanho):
         self.__tamanho = tamanho
         self.__tabela = [ListaEncadeada() for _ in range(tamanho)]
-        self.__comprados = 0        
+        self.__comprados = {}        
 
+
+    def __len__(self):
+        return self.__tamanho
+    
     def calcular_indice(self, chave):
         return chave % self.__tamanho
 
     def comprar(self, chave, valor):
         indice = self.calcular_indice(chave)
         self.__tabela[indice].inserir(chave, valor)
-        self.__comprados += 1
+        self.__comprados[chave] = valor
         return True
 
     @property
@@ -74,11 +78,7 @@ class TabelaHash:
         return f'CPF: {valor}\nNumeros comprados: {v}'
     
     def esgotou(self):
-        if self.__comprados == self.__tamanho:
-            return True
-        else:
-            return False
-
+        return len(self.__comprados) == self.__tamanho
     
 if __name__ == '__main__':
     t = TabelaHash(2)
