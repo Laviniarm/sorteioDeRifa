@@ -98,10 +98,15 @@ class Server:
                     client_socket.send(enviar.encode())
 
             elif msg_client == "SORTEIO":
-                mensagem = self.tabela.sorteio()
-                with self.lock:
-                    for cliente in self.clientes:
-                        cliente.send(mensagem.encode())
+                if self.tabela.esgotou():
+                    mensagem = self.tabela.sorteio()
+                    with self.lock:
+                        for cliente in self.clientes:
+                            cliente.send(mensagem.encode())
+                    break
+                else:
+                    enviar = "Ainda não é possível realizar o sorteio."
+                    client_socket.send(enviar.encode())
 
             # elif msg_client == "SORTEIO":
             #    mensagem = tabela.sorteio()
@@ -111,10 +116,10 @@ class Server:
             self.clientes.remove(client_socket)
             client_socket.close()
 
-# Configurações do servidor
+
 host = 'localhost'
 port = 8888
 
-# Inicialização do servidor
+
 server = Server(host, port)
 server.start()
