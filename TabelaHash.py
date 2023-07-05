@@ -1,88 +1,84 @@
-import random
-from listaEncadeada import ListaEncadeada
+class Entry:
+    __slots__ = ("chave", "valor")
+
+    def __init__(self, chave, valor):
+        self.chave = chave
+        self.valor = valor
+
 
 class TabelaHash:
     def __init__(self, tamanho):
-        self.__tamanho = tamanho
-        self.__tabela = [ListaEncadeada() for _ in range(tamanho)]
-        self.__comprados = {}        
-
+        self._tamanho = tamanho
+        self._tabela = [[] for _ in range(tamanho)]
 
     def __len__(self):
-        return self.__tamanho
-    
-    def calcular_indice(self, chave):
-        return chave % self.__tamanho
+        return self._tamanho
 
-    def comprar(self, chave, valor):
-        indice = self.calcular_indice(chave)
-        self.__tabela[indice].inserir(chave, valor)
-        self.__comprados[chave] = valor
-        return True
+    def hash(self, chave: int):
+        return hash(chave) % self._tamanho
 
-    @property
-    def tamanho(self):
-        return self.__tamanho
+    def put(self, chave, valor):
+        return self.__put(chave, valor)
 
-    def buscar(self, chave):
-        indice = self.calcular_indice(chave)
-        return self.__tabela[indice].buscar(chave)
-    
-    # def comprar(self, cpf, numero):
-    #     indice = numero % self.tamanho
+    def __put(self, chave, valor):
+        indice = self.hash(chave)
 
-    #     if self[indice]:
-    #         return False
+        for entry in self._tabela[indice]:
+            if entry.chave == indice:
+                return -1
 
-    #     self[indice] = [cpf, numero]
-    #     return True
-    
-    def numeros_nao_comprados(self):
-        numeros = [i for i, comprador in enumerate(self.__tabela) if not comprador]
-        return numeros
-    
+        self._tabela[indice].append(Entry(chave, valor))
+        return indice
+
+    def get(self, chave):
+        return self.__get(chave)
+
+    def __get(self, chave):
+        indice = self.hash(chave)
+
+        for entry in self._tabela[indice]:
+            if entry.chave == chave:
+                return entry.valor
+
+        return -1
+
+    def get_tamanho(self):
+        return self.__get_tamanho()
+
+    def __get_tamanho(self):
+        return self._tamanho
+
+    def get_valores_vazios(self):
+        return [i for i, valor in enumerate(self._tabela) if not valor]
+
+    def get_tabela(self):
+        return self.__get_tabela()
+
+    def __get_tabela(self):
+        return self._tabela
+
     def __str__(self):
         s = ""
-        for index, items in enumerate(self.__tabela):
-            if index+1 < 10:
-                s += f"0{index+1}: "
+        for index, items in enumerate(self._tabela):
+            if index + 1 < 10:
+                s += f"0{index + 1}: "
             else:
-                s += f"{index+1}: "
-            if items == None:
+                s += f"{index + 1}: "
+            if items is None:
                 s += " "
             else:
                 s += items.__str__()
             s += "\n"
         return s
 
-    def sorteio(self):
-        v = []
-        for i, item in enumerate(self.__tabela):
-            if len(item) != 0:
-                v.append(i)
-        numero_sorteado = random.choice(v)
-        cpf = self.buscar(numero_sorteado-1)
-        if numero_sorteado < 10:
-            return f'\nSORTEIO!\n\nNumero sorteado: 0{numero_sorteado}\nCPF do ganhador: {cpf}\n'
-        else:
-            return f'\nSORTEIO!\n\nNumero sorteado: {numero_sorteado}\nCPF do ganhador: {cpf}\n'
-    
-    def imprimirCPF(self, valor):
-        v = []
-        for i, item in enumerate(self.__tabela):
-            if len(item) != 0:
-                if self.buscar(i) == valor:
-                    chave = item.getNumero()
-                    if chave < 10:
-                        v.append(f'0{chave}')
-        return f'CPF: {valor}\nNumeros comprados: {v}'
-    
-    def esgotou(self):
-        return len(self.__comprados) == self.__tamanho
-    
-if __name__ == '__main__':
-    t = TabelaHash(2)
-    t.comprar(1, 6824224448)
-    # t.comprar(0, 11532391472)
-    print(t.numeros_nao_comprados())
-    print(t.esgotou())
+
+'''Utilizar as implementações codificadas e concluídas em sala de aula;
+● Adicionar ao menos um novo método em cada estrutura de dados utilizada, que seja
+útil ao domínio do problema (a intenção é não levar para fora da estrutura de dados,
+detalhes de implementação que a própria estrutura de dados deveria encapsular e
+oferecer de forma abstrata ao programador);
+● 'Documentação do código;
+● Encapsulamento;
+● Tratamento de exceções;
+● Interação programa/usuário na exibição das mensagens do sistema (de erro ou alerta,
+emitidas pelas estruturas de dados).'''
