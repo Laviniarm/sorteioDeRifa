@@ -1,0 +1,45 @@
+Documentação do protocolo de aplicação LRV
+
+Protocolo de Aplicação para Compra de Rifa
+
+Mensagem de Boas-vindas
+Cliente → Servidor: N/A
+Servidor → Cliente: "Bem-vindo à compra de rifa!"
+
+ESGOTOU - Solicita ao servidor para verificar se todos os números de rifa foram comprados.
+Parâmetros: Nenhum.
+Resposta do Servidor:
+Se todos os números foram comprados: ESGOTOU
+Se ainda existem números disponíveis: NÃO ESGOTOU
+
+DISPONIVEIS - Solicita ao servidor a lista de números disponíveis para compra.
+Parâmetros: Nenhum
+Resposta do Servidor: String contendo os números disponíveis separados por
+vírgula.
+
+COMPRADOS <cpf> - Solicita ao servidor a lista de números comprados associados a um CPF específico.
+Parâmetros:
+<cpf>: CPF do cliente.
+Resposta do Servidor: String contendo os números comprados pelo CPF especificado.
+
+COMPRAR <cpf> <numero> - Solicita ao servidor a compra de um número de rifa específico.
+Parâmetros:
+<cpf>: CPF do cliente.
+<numero>: Número de rifa desejado.
+Resposta do Servidor:
+Se o número estiver disponível: Número <número> comprado com sucesso!
+Se o número não estiver disponível: Número <numero> não está disponível!
+Se o número for inválido: Número inválido.
+
+SORTEIO - Solicita ao servidor o resultado do sorteio.
+Parâmetros: Nenhum.
+Resposta do Servidor: Mensagem contendo o resultado do sorteio.
+
+SAIR - Solicita ao servidor encerrar a conexão.
+Parâmetros: Nenhum.
+Resposta do Servidor: Nenhuma.
+
+Observações:
+As mensagens são enviadas pelo cliente ao servidor através do método enviar_mensagem.
+O servidor processa as mensagens recebidas através do método handle_client.
+O servidor envia as respostas ao cliente utilizando o método send do socket.
