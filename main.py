@@ -1,3 +1,4 @@
+import sys
 from servidor import Server
 from gerenciador_sorteio import Gerenciador
 
@@ -6,6 +7,11 @@ HOST = '0.0.0.0'
 PORT = 8888
 gerenciador = None
 
+if len(sys.argv) == 2:
+    HOST = sys.argv[1]
+elif len(sys.argv) == 3:
+    HOST = sys.argv[1]
+    PORT = int(sys.argv[2])
 
 def input_quantidade():
     while True:
