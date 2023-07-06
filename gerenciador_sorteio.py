@@ -35,7 +35,7 @@ class Gerenciador:
 
     def realizar_sorteio(self):
         # Método para realizar o sorteio de um número da rifa
-        numero_sorteado = random.randint(0, self.__tabela_rifa.get_tamanho())  # Gera um número aleatório
+        numero_sorteado = random.randint(0, self.__tabela_rifa.get_tamanho()-1)  # Gera um número aleatório
         cpf = self.__tabela_rifa.get(numero_sorteado)  # Obtém o CPF correspondente ao número sorteado
         return [cpf, numero_sorteado]  # Retorna uma lista com o CPF e número sorteado
 
