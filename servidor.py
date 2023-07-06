@@ -3,12 +3,6 @@ import threading
 from gerenciador_sorteio import Gerenciador
 from lista_encadeada import ListaEncadeada
 
-CODIGOS_SERVIDOR = {
-    'OK': 200,
-    'ERRO': 400
-}
-
-
 # Servidor com metodos de inicialização
 class Server:
     def __init__(self, host, port, message_size, gerenciador: Gerenciador):
@@ -17,7 +11,8 @@ class Server:
         self.__server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.__gerenciador = gerenciador
         self.__max_message_size = message_size
-        self.__lock = threading.Lock()
+        self.__lock_clientes = threading.Lock()
+        self.__lock_rifas = threading.Lock()
         self.__clientes = ListaEncadeada()
 
     # Inicia o servidor
@@ -25,9 +20,11 @@ class Server:
         self.__server_socket.bind((self.__host, self.__port))
         self.__server_socket.listen(1)
         print(f"Servidor aguardando conexões em {self.__host}:{self.__port}")
-
-        accept_thread = threading.Thread(target=self.accept_connections)
-        accept_thread.start()
+        
+        try:
+            self.accept_connections()
+        except KeyboardInterrupt:
+            self.__server_socket.close() # Fecha socket do servidor quando clicar CTRL C
 
     # Trata as conexões dos clientes
     def accept_connections(self):
@@ -62,7 +59,8 @@ class Server:
                 self.verificar_disponiveis(client_socket)
 
             elif msg_client == "COMPRADOS":
-                client_socket.send(f"{CODIGOS_SERVIDOR['OK']}-{self.__clientes.buscar(cpf_registrado)}".encode())
+                with self.__lock_rifas:
+                    client_socket.send(f"208-{self.__clientes.buscar(cpf_registrado)}".encode())
 
             elif msg_client == "SAIR":
                 self.desconectar_cliente(client_socket)
@@ -74,59 +72,62 @@ class Server:
             elif msg_client == "SORTEIO":
                 self.sortear(client_socket)
 
-        with self.__lock:
-            client_socket.close()
+        client_socket.close()
 
     def registrar_cliente(self, client_socket, msg_client):
-        _, cpf = msg_client.split()
-        cliente = self.__clientes.buscar(cpf)
-        if cliente is None:
-            self.__clientes.inserir(cpf, [])
-            resposta = f"{CODIGOS_SERVIDOR['OK']}-Cliente {cpf} registrado com sucesso!"
-            client_socket.send(resposta.encode())
-            return cpf
-        else:
-            resposta = f"{CODIGOS_SERVIDOR['OK']}-Cliente {cpf} encontrado com sucesso!"
-            client_socket.send(resposta.encode())
-            return cpf
+        with self.__lock_clientes:
+            _, cpf = msg_client.split()
+            cliente = self.__clientes.buscar(cpf)
+            if cliente is None:
+                self.__clientes.inserir(cpf, [])
+                resposta = f"200-{cpf}"
+                client_socket.send(resposta.encode())
+                return cpf
+            else:
+                resposta = f"201-{cpf}"
+                client_socket.send(resposta.encode())
+                return cpf
 
     def comprar_rifa(self, client_socket, cpf_registrado, msg_client):
-        _, numero = msg_client.split()
-        if int(numero) < 0 or int(numero) >= self.__gerenciador.get_tamanho():
-            resposta = f"{CODIGOS_SERVIDOR['ERRO']}-Número inválido."
-        else:
-            numero_comprado = self.__gerenciador.comprar(int(numero), cpf_registrado)
-            if numero_comprado > -1:
-                numeros_comprados_por_cliente = self.__clientes.buscar(cpf_registrado)
-                numeros_comprados_por_cliente.append(numero_comprado)
-                self.__clientes.set_valor(cpf_registrado, numeros_comprados_por_cliente)
-                resposta = f"{CODIGOS_SERVIDOR['OK']}-Número {numero} comprado com sucesso!"
+        with self.__lock_rifas:
+            _, numero = msg_client.split()
+            if int(numero) < 0 or int(numero) >= self.__gerenciador.get_tamanho():
+                resposta = "400"
             else:
-                resposta = f"{CODIGOS_SERVIDOR['ERRO']}-Número {numero} não está disponível!"
-        client_socket.send(resposta.encode())
+                numero_comprado = self.__gerenciador.comprar(int(numero), cpf_registrado)
+                if numero_comprado > -1:
+                    numeros_comprados_por_cliente = self.__clientes.buscar(cpf_registrado)
+                    numeros_comprados_por_cliente.append(numero_comprado)
+                    self.__clientes.set_valor(cpf_registrado, numeros_comprados_por_cliente)
+                    resposta = f"202-{numero}"
+                else:
+                    resposta = f"401-{numero}"
+            client_socket.send(resposta.encode())
 
     def verificar_disponiveis(self, client_socket):
-        numeros = self.__gerenciador.numeros_nao_comprados()
-        resposta = f"{CODIGOS_SERVIDOR['OK']}-Números disponíveis: " + ", ".join(map(str, numeros))
-        client_socket.send(resposta.encode())
+        with self.__lock_rifas:
+            numeros = self.__gerenciador.numeros_nao_comprados()
+            resposta = f"203-" + ", ".join(map(str, numeros))
+            client_socket.send(resposta.encode())
 
     def desconectar_cliente(self, client_socket):
         print("Cliente", client_socket.getpeername(), "desconectou!")
-        enviar = f"{CODIGOS_SERVIDOR['OK']}-OFF"
+        enviar = "204"
         client_socket.send(enviar.encode())
 
     def validar_esgotou(self, client_socket):
-        if self.__gerenciador.esgotou():
-            enviar = f"{CODIGOS_SERVIDOR['OK']}-ESGOTOU"
-            client_socket.send(enviar.encode())
-        else:
-            enviar = f"{CODIGOS_SERVIDOR['OK']}-NÃO ESGOTOU"
-            client_socket.send(enviar.encode())
+        with self.__lock_rifas:
+            if self.__gerenciador.esgotou():
+                enviar = "205"
+                client_socket.send(enviar.encode())
+            else:
+                enviar = "206"
+                client_socket.send(enviar.encode())
 
     def sortear(self, client_socket):
         if self.__gerenciador.esgotou():
             mensagem = self.__gerenciador.sorteio()
-            client_socket.send(f"{CODIGOS_SERVIDOR['OK']}-{mensagem}".encode())
+            client_socket.send(f"207-{mensagem}".encode())
         else:
-            enviar = f"{CODIGOS_SERVIDOR['ERRO']}-Ainda não é possível realizar o sorteio."
+            enviar = "402"
             client_socket.send(enviar.encode())

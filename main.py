@@ -2,7 +2,7 @@ from servidor import Server
 from gerenciador_sorteio import Gerenciador
 
 MESSAGE_SIZE = 1024
-HOST = 'localhost'
+HOST = '0.0.0.0'
 PORT = 8888
 gerenciador = None
 

@@ -23,14 +23,14 @@ class Gerenciador:
             cpf, numero_sorteado = self.realizar_sorteio()
             self.__numero_sorteado = numero_sorteado
             self.__cpf_sorteado = cpf
-            return f'\nSORTEIO!\n\nNumero sorteado: {str(numero_sorteado).zfill(2)}\nCPF do ganhador: {cpf}\n'
+            return f'{str(numero_sorteado).zfill(2)}-{cpf}'
         else:
-            return f'\nSORTEIO!\n\nNumero sorteado: {str(self.__numero_sorteado).zfill(2)}\nCPF do ganhador: {self.__cpf_sorteado}\n'
+            return f'{str(self.__numero_sorteado).zfill(2)}-{self.__cpf_sorteado}'
 
     def realizar_sorteio(self):
         numero_sorteado = random.randint(0, self.__tabela_rifa.get_tamanho())
         cpf = self.__tabela_rifa.get(numero_sorteado - 1)
-        return cpf, numero_sorteado
+        return [cpf, numero_sorteado]
 
     def esgotou(self):
         return len(self.__comprados) == self.__tabela_rifa.get_tamanho()

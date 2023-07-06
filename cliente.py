@@ -4,9 +4,20 @@ import os
 MAX_MESSAGE_SIZE = 1024
 HOST = 'localhost'
 PORT = 8888
+
 CODIGOS_SERVIDOR = {
-    '200': 'Operação realizada com sucesso',
-    '400': 'Operação não disponível'
+    '200': 'Cliente registrado com sucesso!',
+    '201': 'Cliente encontrado com sucesso!',
+    '202': 'Número comprado com sucesso!',
+    '203': 'Números disponíveis listados.',
+    '204': 'Cliente desconectado com sucesso!',
+    '205': 'Rifas esgotadas.',
+    '206': 'Rifas não estão esgotadas.',
+    '207': 'Sorteio realizado com sucesso!',
+    '208': 'Números comprados até agora.',
+    '400': 'Número inválido.',
+    '401': 'Número não está disponível!',
+    '402': 'Ainda não é possível realizar o sorteio.'
 }
 
 
@@ -43,7 +54,7 @@ def main():
             cls()
             if not verifica_se_esgotou(enviar_mensagem("ESGOTOU")):
                 _, resposta = enviar_mensagem("DISPONIVEIS").split("-", 1)
-                print(resposta)
+                print(f'Números disponíveis: {resposta}')
 
         elif choice == '3':
             cls()
@@ -52,13 +63,17 @@ def main():
 
         elif choice == '4':
             cls()
-            codigo, resposta = enviar_mensagem(f"SORTEIO").split("-", 1)
-            print(CODIGOS_SERVIDOR[codigo])
-            print(resposta)
+            resposta = enviar_mensagem(f"SORTEIO")
+            if resposta == "402":
+                print(CODIGOS_SERVIDOR['402'])
+            else:
+                _, ganhador = resposta.split("-", 1)
+                numero_sorteado, cpf_ganhador = ganhador.split("-", 1)
+                print(f'\nSORTEIO!\n\nNumero sorteado: {numero_sorteado}\nCPF do ganhador: {cpf_ganhador}\n')
 
         elif choice == '5':
-            _, resposta = enviar_mensagem("SAIR").split("-", 1)
-            if resposta == "OFF":
+            resposta = enviar_mensagem("SAIR")
+            if resposta == "204":
                 break
 
         else:
@@ -77,8 +92,7 @@ def comprar_rifa(enviar_mensagem):
     if numero != '':
         codigo, resposta = enviar_mensagem(f"COMPRAR {numero}").split("-", 1)
         print(CODIGOS_SERVIDOR[codigo])
-        if codigo == 200:
-            print(resposta)
+        if codigo == "200":
             verifica_se_esgotou(enviar_mensagem(f"ESGOTOU"))
     else:
         print('Número inválido')
@@ -100,8 +114,7 @@ def input_cpf():
 
 
 def verifica_se_esgotou(resposta):
-    _, resposta = resposta.split("-", 1)
-    if resposta == "ESGOTOU":
+    if resposta == "205":
         print("Numeros esgotados, o sorteio já pode ser realizado")
         return True
     else:
