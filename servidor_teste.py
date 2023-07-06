@@ -1,7 +1,7 @@
 import socket
 import threading
 from gerenciador_sorteio import Gerenciador
-from listaEncadeada import ListaEncadeada
+import gerenciador_servidor
 
 
 # Servidor com metodos de inicialização
