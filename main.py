@@ -21,3 +21,5 @@ except ValueError:
 if gerenciador is not None:
     server = Server(HOST, PORT, MESSAGE_SIZE, gerenciador)
     server.start()
+
+

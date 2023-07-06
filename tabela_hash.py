@@ -79,10 +79,7 @@ class TabelaHash:
         # Método para retornar uma representação em string da tabela hash
         s = ""
         for index, items in enumerate(self.__tabela):
-            if index + 1 < 10:
-                s += f"0{index + 1}: "
-            else:
-                s += f"{index + 1}: "
+            s += f"{index}: "
             if items is None:
                 s += " "
             else:
