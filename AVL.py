@@ -1,4 +1,4 @@
-from comprador import Comprador
+from no import No
 from hashtable import TabelaHash
 
 class AVL:
@@ -19,45 +19,45 @@ class AVL:
             return 0  
         return self.getAltura(no.esq) - self.getAltura(no.dir)
     
-    def addNovoComprador(self, nome, cpf, numero):            
+    def add(self, info1, registro, chave):            
         if self.__raiz == None:
-            self.__raiz = Comprador(nome, cpf, numero)
-            self.__raiz.addNumeros(numero)
+            self.__raiz = No(info1, registro, chave)
+            self.__raiz.addNumeros(chave)
             return self.__raiz
-
         else:
-            return self.__addNovoComprador(self.__raiz, nome, cpf, numero)
-    
-    def __addNovoComprador(self, raiz, nome, cpf, numero):
+            no = self.busca(registro)
+            if no == None:
+                no = self.__add(info1, registro, chave)
+            else:
+                no = self.__addNovo(registro, chave)
+
+    def __add(self, raiz, info1, registro, chave):
         if not raiz:
-            no = Comprador(nome, cpf, numero)
-            no.addNumeros(numero)
+            no = No(info1, registro, chave)
+            no.addNumeros(chave)
             return no
-        if cpf < raiz.getCPF(): 
-            no = raiz.esq = self.__addNovoComprador(raiz.esq, nome, cpf, numero)
+        if registro < raiz.getRegistro(): 
+            no = raiz.esq = self.__add(raiz.esq, info1, registro, chave)
             return no
         else: 
-            no = raiz.dir = self.__addNovoComprador(raiz.dir, nome, cpf, numero)
+            no = raiz.dir = self.__add(raiz.dir, info1, registro, chave)
         raiz.altura = 1 + max(self.getAltura(raiz.esq), self.getAltura(raiz.dir))
         balance = self.getBalance(raiz) 
-        if balance > 1 and cpf < raiz.esq.cpf: 
+        if balance > 1 and registro < raiz.esq.registro: 
             return self.__dirRotate(raiz)
-        if balance < -1 and cpf > raiz.dir.cpf: 
+        if balance < -1 and registro > raiz.dir.registro: 
             return self.__esqRotate(raiz) 
-        if balance > 1 and cpf > raiz.esq.cpf: 
+        if balance > 1 and registro > raiz.esq.registro: 
             raiz.esq = self.__esqRotate(raiz.esq) 
             return self.__dirRotate(raiz)
-        if balance < -1 and cpf < raiz.dir.cpf: 
+        if balance < -1 and registro < raiz.dir.registro: 
             raiz.dir = self.__dirRotate(raiz.dir) 
             return self.__esqRotate(raiz)
         return no
-    
-    def addNovoNumero(self, cpf, numero):
-        return self.__addNovoNumero(cpf, numero)
 
-    def addNovoNumero(self, cpf, numero):
-        no = self.busca(cpf)
-        no.addNumeros(numero)
+    def __addNovo(self, registro, chave):
+        no = self.busca(registro)
+        no.addNumeros(chave)
         return no
     
     def __esqRotate(self, no):
@@ -78,20 +78,20 @@ class AVL:
         novaRaiz.altura = 1 + max(self.getAltura(novaRaiz.esq), self.getAltura(novaRaiz.dir)) 
         return novaRaiz
     
-    def busca(self, cpf):
+    def busca(self, registro):
         if self.__raiz != None:
-            dado = self.__busca(cpf, self.__raiz)
+            dado = self.__busca(registro, self.__raiz)
             return None if dado is None else dado
         else:
             return None
     
-    def __busca(self, cpf, no):
-        if cpf == no.getCPF():
+    def __busca(self, registro, no):
+        if registro == no.getRegistro():
             return no
-        elif cpf < no.getCPF() and no.esq != None:
-            return self.__busca(cpf, no.esq)
-        elif cpf > no.getCPF() and no.dir != None:
-            return self.__busca(cpf, no.dir)
+        elif registro < no.getRegistro() and no.esq != None:
+            return self.__busca(registro, no.esq)
+        elif registro > no.getRegistro() and no.dir != None:
+            return self.__busca(registro, no.dir)
         else:
             return None
         

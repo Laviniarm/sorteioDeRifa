@@ -1,6 +1,6 @@
 import socket
 import threading
-from gerenciador_sorteio import Gerenciador
+from gerenciador import Gerenciador
 import gerenciador_servidor
 
 

@@ -1,5 +1,5 @@
-from servidor_teste import Server
-from gerenciador_sorteio import Gerenciador
+from servidor import Server
+from gerenciador import Gerenciador
 
 MESSAGE_SIZE = 1024
 HOST = 'localhost'

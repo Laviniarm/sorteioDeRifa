@@ -1,10 +1,13 @@
-# from comprador import Comprador
+import random
+from no import Comprador
 
 class TabelaHash:
     def __init__(self, tamanho):
         self.__tamanho = tamanho
         self.__tabela = [None for i in range(tamanho)]
-        self.__comprados = 0
+        self.__comprados = {}
+        self.__numero_sorteado = None
+        self.__cpf_sorteado = ''
 
     def __hash(self, chave):
         return hash(chave) % self.__tamanho
@@ -17,17 +20,6 @@ class TabelaHash:
             slot = self.__hash(chave)
             self.__tabela[slot] = obj
             self.__comprados += 1
-    
-    '''
-    def addTabela(self, nome, cpf, numero):
-        return self.__addTabela(nome, cpf, numero)
-
-    def __addTabela(self, nome, cpf, numero):
-        if self.__comprados < self.__tamanho:
-            slot = self.__hash(numero)
-            self.__tabela[slot] = Comprador(nome, cpf, numero)
-            self.__comprados += 1
-    '''
     
     def __str__(self):
         s = ""
