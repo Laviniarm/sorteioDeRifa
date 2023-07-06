@@ -6,6 +6,9 @@ HOST = '0.0.0.0'
 PORT = 8888
 gerenciador = None
 
+'''
+Classe responsável por iniciar o servidor
+'''
 try:
     quantidade = int(input("Quantidade de números no sorteio: "))
     if quantidade > 0:

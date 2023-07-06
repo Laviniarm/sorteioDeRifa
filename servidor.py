@@ -3,7 +3,9 @@ import threading
 from gerenciador_sorteio import Gerenciador
 from lista_encadeada import ListaEncadeada
 
-# Servidor com metodos de inicialização
+'''
+Classe responsável por gerenciar as conexões dos clientes
+'''
 class Server:
     def __init__(self, host, port, message_size, gerenciador: Gerenciador):
         self.__host = host
@@ -55,20 +57,25 @@ class Server:
             if msg_client.startswith("COMPRAR"):
                 self.comprar_rifa(client_socket, cpf_registrado, msg_client)
 
+            # Lista os números disponíveis para compra
             elif msg_client == "DISPONIVEIS":
                 self.verificar_disponiveis(client_socket)
 
+            # Mostra os números comprados pelo cliente
             elif msg_client == "COMPRADOS":
                 with self.__lock_rifas:
                     client_socket.send(f"208-{self.__clientes.buscar(cpf_registrado)}".encode())
 
+            # Desconecta o cliente
             elif msg_client == "SAIR":
                 self.desconectar_cliente(client_socket)
                 break
 
+            # Verifica se os números disponiveis já esgotaram
             elif msg_client == "ESGOTOU":
                 self.validar_esgotou(client_socket)
 
+            # Realiza o sorteio, caso não existam mais números disponiveis
             elif msg_client == "SORTEIO":
                 self.sortear(client_socket)
 
@@ -80,11 +87,11 @@ class Server:
             cliente = self.__clientes.buscar(cpf)
             if cliente is None:
                 self.__clientes.inserir(cpf, [])
-                resposta = f"200-{cpf}"
+                resposta = "200"
                 client_socket.send(resposta.encode())
                 return cpf
             else:
-                resposta = f"201-{cpf}"
+                resposta = "201"
                 client_socket.send(resposta.encode())
                 return cpf
 
@@ -99,9 +106,9 @@ class Server:
                     numeros_comprados_por_cliente = self.__clientes.buscar(cpf_registrado)
                     numeros_comprados_por_cliente.append(numero_comprado)
                     self.__clientes.set_valor(cpf_registrado, numeros_comprados_por_cliente)
-                    resposta = f"202-{numero}"
+                    resposta = f"202"
                 else:
-                    resposta = f"401-{numero}"
+                    resposta = f"401"
             client_socket.send(resposta.encode())
 
     def verificar_disponiveis(self, client_socket):

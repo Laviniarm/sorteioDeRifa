@@ -6,38 +6,47 @@ Mensagem de Boas-vindas
 Cliente → Servidor: N/A
 Servidor → Cliente: "Bem-vindo à compra de rifa!"
 
+REGISTRAR <cpf> - Solicita ao servidor o registro de um novo cliente
+Parâmetros:
+<cpf>: CPF do cliente.CPF do cliente que quer se registrar
+Resposta do Servidor:
+200 - Caso o cliente seja um novo cliente, e tenha se registrado com sucesso
+201 - Caso o cliente seja um cliente já registrado, e tenha se autenticado novamente com sucesso
+
 ESGOTOU - Solicita ao servidor para verificar se todos os números de rifa foram comprados.
 Parâmetros: Nenhum.
 Resposta do Servidor:
-Se todos os números foram comprados: ESGOTOU
-Se ainda existem números disponíveis: NÃO ESGOTOU
+205 - Se todos os números foram comprados
+206 - Se ainda existem números disponíveis
 
 DISPONIVEIS - Solicita ao servidor a lista de números disponíveis para compra.
 Parâmetros: Nenhum
-Resposta do Servidor: String contendo os números disponíveis separados por
-vírgula.
+Resposta do Servidor:
+203 - Números disponiveis encontrados com sucesso, seguido de String contendo os números disponíveis separados por vírgula.
 
-COMPRADOS <cpf> - Solicita ao servidor a lista de números comprados associados a um CPF específico.
-Parâmetros:
-<cpf>: CPF do cliente.
-Resposta do Servidor: String contendo os números comprados pelo CPF especificado.
+COMPRADOS - Solicita ao servidor a lista de números comprados associados ao CPF do cliente conectado.
+Parâmetros: Nenhum
+Resposta do Servidor:
+208 - Números comprados encontrados com sucesso, seguido de String contendo os números comprados pelo CPF especificado.
 
-COMPRAR <cpf> <numero> - Solicita ao servidor a compra de um número de rifa específico.
+COMPRAR <numero> - Solicita ao servidor a compra de um número de rifa específico.
 Parâmetros:
-<cpf>: CPF do cliente.
 <numero>: Número de rifa desejado.
 Resposta do Servidor:
-Se o número estiver disponível: Número <número> comprado com sucesso!
-Se o número não estiver disponível: Número <numero> não está disponível!
-Se o número for inválido: Número inválido.
+202 - Compra do número realizada com sucesso.
+401 - Número não estiver disponível
+400 - Número inválido
 
 SORTEIO - Solicita ao servidor o resultado do sorteio.
 Parâmetros: Nenhum.
-Resposta do Servidor: Mensagem contendo o resultado do sorteio.
+Resposta do Servidor:
+207 - Caso o sorteio tenha sido realizado, seguido de String com os dados do sorteio
+402 - Caso não seja possível realizar o sorteio ainda
 
 SAIR - Solicita ao servidor encerrar a conexão.
 Parâmetros: Nenhum.
-Resposta do Servidor: Nenhuma.
+Resposta do Servidor:
+204 - Caso a desconexão tenha sido bem sucedida
 
 Observações:
 As mensagens são enviadas pelo cliente ao servidor através do método enviar_mensagem.

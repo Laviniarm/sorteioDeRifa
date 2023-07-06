@@ -36,8 +36,8 @@ def main():
         client_socket.send(mensagem.encode())
         return client_socket.recv(MAX_MESSAGE_SIZE).decode()
 
-    enviar_mensagem(f"REGISTRAR {input_cpf()}")
-
+    resposta = enviar_mensagem(f"REGISTRAR {input_cpf()}")
+    print(CODIGOS_SERVIDOR[resposta])
     resposta = enviar_mensagem("ESGOTOU")
 
     verifica_se_esgotou(resposta)
@@ -58,7 +58,8 @@ def main():
 
         elif choice == '3':
             cls()
-            _, resposta = enviar_mensagem(f"COMPRADOS").split("-", 1)
+            codigo, resposta = enviar_mensagem(f"COMPRADOS").split("-", 1)
+            print(CODIGOS_SERVIDOR[codigo])
             print(resposta)
 
         elif choice == '4':
@@ -86,11 +87,12 @@ def main():
 
 
 def comprar_rifa(enviar_mensagem):
-    _, resposta = enviar_mensagem("DISPONIVEIS").split("-", 1)
-    print(resposta)
+    codigo, resposta = enviar_mensagem("DISPONIVEIS").split("-", 1)
+    if codigo == "203":
+        print("Números disponíveis: " + resposta)
     numero = input_numero()
     if numero != '':
-        codigo, resposta = enviar_mensagem(f"COMPRAR {numero}").split("-", 1)
+        codigo = enviar_mensagem(f"COMPRAR {numero}")
         print(CODIGOS_SERVIDOR[codigo])
         if codigo == "200":
             verifica_se_esgotou(enviar_mensagem(f"ESGOTOU"))
@@ -99,9 +101,13 @@ def comprar_rifa(enviar_mensagem):
 
 
 def input_numero():
-    numero = input("Digite o número desejado: ")
-    cls()
-    return numero
+    while True:
+        numero = input("Digite o número desejado: ")
+        if numero.isdigit():
+            cls()
+            return numero
+        else:
+            print("Entrada inválida. Digite apenas números.")
 
 
 def input_cpf():
